@@ -43,6 +43,7 @@
   border-radius: 5px;
   color: #fff;
   transition: 0.2s all;
+  backface-visibility: hidden;
 }
 .help-input {
   border: none;
@@ -72,7 +73,13 @@ input:focus, input:active {
 .help-button:focus, .image-text:focus {
   outline: none;
 }
-
+.help-button:disabled {
+  background: #f98b38bf;
+  cursor: not-allowed;
+}
+.help-button:hover {
+  cursor: pointer;
+}
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {

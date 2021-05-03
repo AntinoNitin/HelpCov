@@ -22,6 +22,7 @@ const PhoneCard = (props) => {
     useEffect(()=>{
         (async function(){
             const res = await getState()
+            // console.log('res', res.data.state)
             setStateList(res.data.state)
         })()
     }, [])
@@ -29,6 +30,7 @@ const PhoneCard = (props) => {
         if(stateName) {
             (async function(){
                 const res = await getCity(stateName)
+                // console.log('city', res.data.city)
                 setCityList(res.data.city)
             })()
         }
@@ -39,7 +41,7 @@ const PhoneCard = (props) => {
         // if (event.files && event.files[0]) {
 
         //     var reader = new FileReader();
-        //     console.log(reader)
+        
         //     reader.onload = function(e) {
         //       document.getElementById('image-logo').attr('src', e.target.result);
         //     }
@@ -59,11 +61,14 @@ const PhoneCard = (props) => {
             registrationId,
             image
         }
-        const token = localStorage.getItem('accessToken')
-        const res = await registerUser(userData, token)
 
-        if(res.status === 'success') {
-            props.setUserId(res.data.response.profile.userId)
+        if(privacy) {
+            const token = localStorage.getItem('accessToken')
+            const res = await registerUser(userData, token)
+            if(res.status === 'success') {
+                props.setUserId(res.data.response.profile.userId)
+                props.setProfileId(res.data.response.profile._id)
+            }
         }
     }
 
@@ -85,10 +90,16 @@ const PhoneCard = (props) => {
                 </div>
             </div>
 
+            {/* Name */}
             <InputField label={'Name'} type={'text'} value={name} setValue={setName} />
+
+            {/* Contact Number */}
             <InputField label={'Contact Number'} type={'number'} value={contactNumber} setValue={setContactNumber}/>
+
+            {/* Address */}
             <InputField label={'Address'} type={'text'} value={address} setValue={setAddress}/>
 
+            {/* State & City */}
             <div className='hc-align'>
                 <div className="w-46 hc-card">
                     <div className="w-100 label-text"> 
@@ -136,10 +147,17 @@ const PhoneCard = (props) => {
                     </div>
                 </div>
             </div>
+
+            {/* Pincode */}
             <InputField label={'Pincode'} type={'number'} value={pinCode} setValue={setPincode}/>
+
+            {/* User type */}
             <InputField label={'Type'} type={'text'} value={userType} setValue={setType}/>
+
+            {/* Registration id */}
             <InputField label={'RegistrationId'} type={'text'} value={registrationId} setValue={setRegistrationId}/>
             
+            {/* Terms & conditions */}
             <div className="w-100 hc-card" style={{display:"flex", alignItems:'center'}}>
                 <div style={{display:'flex'}}>
                     <input 

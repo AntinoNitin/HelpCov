@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import PhoneCard from './components/PhoneCard'
 import FileUpload from './components/FileUpload'
 import Register from './components/Register'
-import {getOTP, verifyOTP} from './Apis/api'
+import {getOTP, verifyOTP, getUser} from './Apis/api'
 import './App.css';
 
 function App() {
@@ -11,28 +11,46 @@ function App() {
   const [OTPSend, setOTPSend] = useState(false)
   const [otpVerified, setOptVerified] = useState(false)
   const [userId, setUserId] = useState('')
+  const [profileId, setProfileId] = useState('')
   const [token, setToken] = useState('')
 
   const handleSendOTP = async () => {
-    const { data } = await getOTP({mobileNumber: phone})
-    if(data.response.status){
-      setToken(data.response.token)
+    if(phone) {
+      const { data } = await getOTP({mobileNumber: phone})
+      if(data.response.status){
+        setToken(data.response.token)
+        setOTPSend(true)
+      }
       setOTPSend(true)
     }
-    setOTPSend(true)
   }
   const handleVerifyOTP = async () => {
-    const { data } = await verifyOTP({'otp': OTP.toString()}, token)
-    console.log(data)
-    if(data.response.token) {
-      console.log('access', data.response.token.accessToken)
-      localStorage.setItem('accessToken', data.response.token.accessToken)
-      localStorage.setItem('refreshToken', data.response.token.refreshToken)
+    if(OTP) {
+      const { data } = await verifyOTP({'otp': OTP.toString()}, token)
+      if(data.response.token) {
+        localStorage.setItem('accessToken', data.response.token.accessToken)
+        localStorage.setItem('refreshToken', data.response.token.refreshToken)
+      }
+      if(data.response.isProfileExist) {
+        
+        const res = await getUser(data.response.token.accessToken)
+        if(res.status === "success") {
+          const {userId, _id} = res.data.response.profile
+          setUserId(userId)
+          setProfileId(_id)
+        }
+      }
+      setOptVerified(true)
+
     }
-    if(data.response.userId) {
-      setUserId(data.response.userId)
-    }
-    setOptVerified(true)
+  }
+
+  const handleRest = () => {
+    setUserId('')
+    setPhone('')
+    setOTP('')
+    setOptVerified(false)
+    setOTPSend(false)
   }
   return (
     <div className="App">
@@ -51,6 +69,7 @@ function App() {
         :
         <PhoneCard 
             label='Verify OTP' 
+            phoneNumber={phone}
             value={OTP} 
             setValue={setOTP}
             buttonName={'Verify'}
@@ -58,7 +77,10 @@ function App() {
             handleSendOTP={handleSendOTP}
           />
           ):
-        (userId ? < FileUpload userId={userId} /> :<Register setUserId={setUserId}/>)
+        (userId ? 
+          < FileUpload userId={userId} profileId={profileId} handleRest={handleRest}/> 
+          :
+          <Register setUserId={setUserId} setProfileId={setProfileId}/>)
         }
       </main>
     </div>

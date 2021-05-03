@@ -14,7 +14,6 @@ export async function verifyOTP (otp, token) {
         'Authorization': `bearer ${token}` 
       }
     })
-    console.log('res', res.data)
     return res.data
 }
 
@@ -34,5 +33,19 @@ export async function getState() {
 
 export async function getCity(state) {
     const res = await axios.get(`${baseUrl}city/state/${state}`)
+    return res.data
+}
+
+export async function getUser (token) {
+    const res = await axios.get(baseUrl + 'profile',{
+    headers: {
+        'Authorization': `bearer ${token}` 
+      }
+    })
+    return res.data
+}
+
+export async function uploadFile (userFiles) {
+    const res = await axios.post(baseUrl +'add-availability/bulkupload', userFiles )
     return res.data
 }
