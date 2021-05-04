@@ -10,6 +10,7 @@ const PhoneCard = (props) => {
     const [registrationId, setRegistrationId] = useState('')
     const [privacy, setPrivacy] = useState(false)
     const [image, setImage] = useState({})
+    const [showImage, setShowImage] = useState('')
     const [pinCode, setPincode] = useState()
     const [stateList, setStateList] = useState([])
     const [stateName, setState] = useState('')
@@ -36,18 +37,14 @@ const PhoneCard = (props) => {
         }
     }, [stateName])
     const imageChange = (event)=>{
-        console.log(event)
-        setImage(event)
-        // if (event.files && event.files[0]) {
-
-        //     var reader = new FileReader();
-        
-        //     reader.onload = function(e) {
-        //       document.getElementById('image-logo').attr('src', e.target.result);
-        //     }
-            
-        //     reader.readAsDataURL(event.files[0]); // convert to base64 string
-        //   }
+        setImage(event.target.files[0])
+        if (event.target.files && event.target.files[0]) {
+            var reader = new FileReader();        
+            reader.onload = function(e) {
+                setShowImage(e.target.result)
+            }            
+            reader.readAsDataURL(event.target.files[0]); // convert to base64 string
+          }
     }
     const handleRegister = async () => {
         const userData = {
@@ -77,7 +74,7 @@ const PhoneCard = (props) => {
             <h1 className="heading">Add your details</h1>
             <div className="image-container">
                 <div className="image">
-                    <img src="/empty.jpg" id="image-logo" className="image-icon"/>
+                    <img src={showImage ? showImage : "/empty.jpg"} id="image-logo" className="image-icon"/>
                 </div>
                 <button className="image-text" onClick={handleClickImage}>Add Image</button>
                 <div onClick={(e) => e.stopPropagation()}>
@@ -85,6 +82,7 @@ const PhoneCard = (props) => {
                         id="upload_picture"
                         onChange={(e) => imageChange(e)}
                         type="file"
+                        accept="image/*"
                         style={{display:'none'}}
                     />
                 </div>
