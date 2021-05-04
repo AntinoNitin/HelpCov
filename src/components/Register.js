@@ -31,7 +31,6 @@ const PhoneCard = (props) => {
         if(stateName) {
             (async function(){
                 const res = await getCity(stateName)
-                // console.log('city', res.data.city)
                 setCityList(res.data.city)
             })()
         }
@@ -74,7 +73,7 @@ const PhoneCard = (props) => {
             <h1 className="heading">Add your details</h1>
             <div className="image-container">
                 <div className="image">
-                    <img src={showImage ? showImage : "/empty.jpg"} id="image-logo" className="image-icon"/>
+                    <img src={showImage ? showImage : "/empty.jpg"} id="image-logo" className="image-icon"  alt="logo"/>
                 </div>
                 <button className="image-text" onClick={handleClickImage}>Add Image</button>
                 <div onClick={(e) => e.stopPropagation()}>

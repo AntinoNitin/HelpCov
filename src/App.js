@@ -3,6 +3,7 @@ import PhoneCard from './components/PhoneCard'
 import FileUpload from './components/FileUpload'
 import Register from './components/Register'
 import {getOTP, verifyOTP, getUser} from './Apis/api'
+
 import './App.css';
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <p className="header-text"> HelpCov India </p>
+        <a href='/Demo.xlsx' style={{color: '#fff',textDecoration: 'none'}} download>Click to download demo file</a>
       </header>
       <main className="main_content">
         {!otpVerified ? (!OTPSend ?

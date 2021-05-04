@@ -1,8 +1,10 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useDropzone} from 'react-dropzone';
 import {uploadFile} from '../Apis/api'
+import * as XLSX from 'xlsx';
 function FileUpload(props) {
   const [successSubmit, setSuccesssSubmit] = useState(false)
+  const [submitArray, setsubmitArray] = useState([])
   const {
     acceptedFiles,
     getRootProps,
@@ -11,10 +13,7 @@ function FileUpload(props) {
     maxFiles:100
   });
 
-  const acceptedFileItems = acceptedFiles.map((file, index )=> {
-    
-    acceptedFiles[index].userId= props.userId
-    acceptedFiles[index].profileId= props.profileId
+  const acceptedFileItems = acceptedFiles.map((file)=> {
     return (
     <li key={file.path} style={{fontSize:"1.6rem"}}>
       {file.path}
@@ -22,25 +21,62 @@ function FileUpload(props) {
     )
     });
 
-//   const fileRejectionItems = fileRejections.map(({ file, errors  }) => { 
-//    return (
-//      <li key={file.path}>
-//           {file.path} - {file.size} bytes
-//           <ul>
-//             {errors.map(e => <li key={e.code}>{e.message}</li>)}
-//          </ul>
-
-//      </li>
-//    ) 
-//   });
-  const handleSubmit = async () => {
-      if(acceptedFiles.length > 0) {
-        const res = await uploadFile(acceptedFiles)
-        if(res.status === "success") {
-          acceptedFiles.length = 0
-          setSuccesssSubmit(true)
-        }
+    useEffect(()=>{
+      if(submitArray.length > 0) {        
+        (async () =>{
+          const res = await uploadFile(submitArray)
+          if(res.status === "success") {
+            acceptedFiles.length = 0
+            setSuccesssSubmit(true)
+          }
+        })()
       }
+    }, [submitArray])
+  const handleSubmit = async () => {
+    if(acceptedFiles.length > 0) {
+      const csvArray = []
+      for(let i = 0; i < acceptedFiles.length; i++){
+       
+        var reader = new FileReader()           
+        reader.onload = (evt) => {
+          const bstr = evt.target.result;
+          const wb = XLSX.read(bstr, { type: 'binary' });
+
+          /* Get first worksheet */
+          const wsname = wb.SheetNames[0];
+          const ws = wb.Sheets[wsname];
+
+          /* Convert array of arrays */
+          const data = XLSX.utils.sheet_to_csv(ws, { header: 1 });
+          const splitData = data.split(/\r\n|\n/)
+          
+          for( let index = 0; index < splitData.length; index++) {
+            if( index !==0 && splitData[index]) {
+              const splitedVal = splitData[index].split(',')
+              let temp ={
+                contactPerson: splitedVal[0],
+                contactNumber: splitedVal[1],
+                address: splitedVal[2],
+                registrationId: splitedVal[3],
+                stateName: splitedVal[4],
+                cityName: splitedVal[5],
+                pinCode: splitedVal[6],
+                userType: splitedVal[7],
+                products: splitedVal[8],
+                units: splitedVal[9],
+                userId: props.userId,
+                profileId: props.profileId
+              }
+              csvArray.push(temp)
+            }
+            if(i === acceptedFiles.length-1 && index === splitData.length-1 ) {
+              setsubmitArray(csvArray)
+            }                      
+          }     
+        }            
+       reader.readAsBinaryString(acceptedFiles[i]); // convert to base64 string       
+      }
+    }
   }
 
   return (
